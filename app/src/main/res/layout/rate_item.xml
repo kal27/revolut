@@ -8,7 +8,7 @@
     <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="@dimen/margin_padding_small"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -17,9 +17,9 @@
         <TextView
                 android:id="@+id/rate_currency"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
+                android:padding="@dimen/margin_padding_medium"
                 android:layout_width="wrap_content"
-                android:textSize="14sp"/>
+                android:textSize="@dimen/text_size_regular"/>
 
     </androidx.cardview.widget.CardView>
 
