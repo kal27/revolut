@@ -4,12 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
-class RatesAdapter : RecyclerView.Adapter<RateViewHolder>() {
+class RatesAdapter(private val onFocusChangedListener: (Boolean) -> Unit) : RecyclerView.Adapter<RateViewHolder>() {
 
-    private val rates: MutableList<Pair<String, Double>> = mutableListOf()
+    private var rates: MutableList<Pair<String, Double>> = mutableListOf()
 
     fun setData(list: List<Pair<String, Double>>) {
-        rates.addAll(list)
+        rates = list.toMutableList()
         notifyDataSetChanged()
     }
 
@@ -18,8 +18,22 @@ class RatesAdapter : RecyclerView.Adapter<RateViewHolder>() {
         return RateViewHolder(inflater, parent)
     }
 
+    private fun onItemFocusChanged(hasFocus: Boolean, position: Int) {
+        onFocusChangedListener(hasFocus)
+        if (hasFocus) {
+            moveItem(position)
+        }
+    }
+
+    private fun moveItem(position: Int) {
+        if ((rates.size < position) and (position == -1)) return
+        val item = rates.removeAt(position)
+        rates.add(0, item)
+        notifyItemMoved(position, 0)
+    }
+
     override fun onBindViewHolder(holder: RateViewHolder, position: Int) {
-        holder.bind(rates[position])
+        holder.bind(rates[position], this::onItemFocusChanged)
     }
 
     override fun getItemCount(): Int = rates.size

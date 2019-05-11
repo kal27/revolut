@@ -10,9 +10,20 @@ import kotlinx.android.synthetic.main.rate_item.view.*
 class RateViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
     RecyclerView.ViewHolder(inflater.inflate(R.layout.rate_item, parent, false)) {
 
-    fun bind(rate: Pair<String, Double>) {
-        itemView.rate_currency.text = rate.first
-        itemView.rate_input.hint = String.format(itemView.resources.getString(R.string.rate_hint), rate.first)
-        itemView.rate_input.setText(rate.second.toString())
+    fun bind(
+        rate: Pair<String, Double>,
+        onItemFocusChanged: (Boolean, Int) -> Unit
+    ) {
+        itemView.apply {
+            rate_currency.text = rate.first
+            rate_input.hint = String.format(resources.getString(R.string.rate_hint), rate.first)
+            rate_input.setText(rate.second.toString())
+
+            rate_input.setOnFocusChangeListener { _, hasFocus -> onItemFocusChanged(hasFocus, adapterPosition) }
+
+            setOnClickListener {
+                rate_input.clearFocus()
+            }
+        }
     }
 }

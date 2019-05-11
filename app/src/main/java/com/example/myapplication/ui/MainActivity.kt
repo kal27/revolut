@@ -13,7 +13,7 @@ class MainActivity : DaggerAppCompatActivity(), MainActivityPresenter.View {
     @Inject
     lateinit var presenter: MainActivityPresenter
 
-    private val adapter: RatesAdapter = RatesAdapter()
+    private val adapter: RatesAdapter = RatesAdapter(onFocusChangedListener = { presenter.onFocusChanged(it) })
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

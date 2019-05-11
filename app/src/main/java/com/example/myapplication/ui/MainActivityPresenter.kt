@@ -15,14 +15,17 @@ class MainActivityPresenter @Inject constructor(private val service: Conversions
 
     var view: View? = null
 
+    private var hasFocus = false
+
     fun onAttach(view: View) {
         this.view = view
-        search()
+        startUpdating()
     }
 
-    private fun search() {
+    private fun startUpdating() {
         disposable = Observable
             .interval(1, TimeUnit.SECONDS)
+            .filter { !hasFocus }
             .flatMap { updateData() }
             .subscribe({
                 view?.loadRates(it.rates.toList())
@@ -31,10 +34,18 @@ class MainActivityPresenter @Inject constructor(private val service: Conversions
             })
     }
 
-    private fun updateData(): Observable<Conversion>? {
+    fun onFocusChanged(hasFocus: Boolean) {
+        this.hasFocus = hasFocus
+    }
+
+    private fun updateData(): Observable<Conversion> {
         return service.conversions("EUR")
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.single())
+    }
+
+    fun onListClicked() {
+        hasFocus = false
     }
 
     fun onDetach() {
