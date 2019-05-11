@@ -23,7 +23,7 @@
                 android:padding="@dimen/margin_padding_small"
                 android:textSize="@dimen/text_size_regular"/>
 
-        <com.google.android.material.textfield.TextInputLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/rate_inputLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -31,18 +31,23 @@
                 app:layout_constraintStart_toEndOf="@id/rate_currency"
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_marginStart="@dimen/margin_padding_medium"
-                android:layout_marginEnd="@dimen/margin_padding_medium"
-                app:errorEnabled="true">
+                android:layout_marginEnd="@dimen/margin_padding_medium">
 
             <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/rate_input"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
+                    android:gravity="end"
                     android:minWidth="@dimen/rate_input_min_width"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:layout_marginStart="@dimen/margin_padding_medium"
+                    android:layout_marginEnd="@dimen/margin_padding_medium"
                     android:inputType="numberDecimal"/>
 
-        </com.google.android.material.textfield.TextInputLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
