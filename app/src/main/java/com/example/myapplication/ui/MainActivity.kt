@@ -24,10 +24,23 @@ class MainActivity : DaggerAppCompatActivity(), MainActivityPresenter.View {
 
         presenter.onAttach(this)
 
+        activityMain_refreshControl.setOnRefreshListener {
+            presenter.onRefresh()
+            activityMain_refreshControl.isRefreshing = false
+        }
+
         activityMain_ratesList.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = this@MainActivity.adapter
         }
+    }
+
+    override fun showList() {
+        activityMain_ratesList.visibility = View.VISIBLE
+    }
+
+    override fun hideList() {
+        activityMain_ratesList.visibility = View.GONE
     }
 
     override fun loadRates(list: List<Rate>) {

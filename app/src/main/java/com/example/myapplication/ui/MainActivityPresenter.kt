@@ -29,17 +29,32 @@ class MainActivityPresenter @Inject constructor(private val service: Conversions
     }
 
     private fun startUpdating() {
-        view?.showProgressBar()
+        showLoadingIndication()
+
         disposable = Observable
             .interval(1, TimeUnit.SECONDS)
             .flatMap { updateData() }
             .subscribe(this::handleResult, this::handleError)
     }
 
+    private fun showLoadingIndication() {
+        view?.hideList()
+        view?.showProgressBar()
+    }
+
+    private fun hideLoadingIndication() {
+        view?.hideProgressBar()
+        view?.showList()
+    }
+
     private fun handleResult(conversion: Conversion) {
         val list = conversion.rates.toList()
         view?.loadRates(list.map { Rate(it.first, it.second) })
-        view?.hideProgressBar()
+        hideLoadingIndication()
+    }
+
+    fun onRefresh() {
+        startUpdating()
     }
 
     private fun handleError(error: Throwable) {
@@ -64,6 +79,8 @@ class MainActivityPresenter @Inject constructor(private val service: Conversions
     }
 
     interface View {
+        fun hideList()
+        fun showList()
         fun showProgressBar()
         fun hideProgressBar()
         fun loadRates(list: List<Rate>)
