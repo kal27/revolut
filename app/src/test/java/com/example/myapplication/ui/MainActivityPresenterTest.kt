@@ -15,6 +15,7 @@ class MainActivityPresenterTest {
     private var service: ConversionsService = mock()
     private val view: MainActivityPresenter.View = mock()
     private var presenter: MainActivityPresenter = MainActivityPresenter(service)
+    private val defaultBase = "EUR"
 
     @Before
     fun setUp() {
@@ -33,7 +34,7 @@ class MainActivityPresenterTest {
     fun `view displays toast when service error occurs`() {
         val message = "localized"
         val error: Throwable = mock { whenever(it.localizedMessage) doReturn message }
-        service = mock { whenever(it.conversions("EUR")) doReturn Observable.error(error) }
+        service = mock { whenever(it.conversions(defaultBase)) doReturn Observable.error(error) }
         presenter = MainActivityPresenter(service)
         presenter.onAttach(view)
 
@@ -44,11 +45,11 @@ class MainActivityPresenterTest {
 
     @Test
     fun `view displays list and hides progress bar when data is returned by the service`() {
-        val map = sortedMapOf(Pair("EUR", 2.0))
+        val map = sortedMapOf(Pair(defaultBase, 2.0))
         val conversion: Conversion = mock {
             whenever(it.rates) doReturn map
         }
-        service = mock { whenever(it.conversions("EUR")) doReturn Observable.just(conversion) }
+        service = mock { whenever(it.conversions(defaultBase)) doReturn Observable.just(conversion) }
         presenter = MainActivityPresenter(service)
         presenter.onAttach(view)
 
@@ -62,20 +63,18 @@ class MainActivityPresenterTest {
     @Test
     fun `base value is updated after rate change`() {
         presenter.onAttach(view)
-        val base = "EUR"
         val value = "2.1"
-        presenter.onRateChanged(base, value)
+        presenter.onRateChanged(defaultBase, value)
 
-        verify(view).updateBaseValue(value.toDouble(), base)
+        verify(view).updateBaseValue(value.toDouble(), defaultBase)
     }
 
     @Test
     fun `no interactions with view after detach`() {
         presenter.onDetach()
 
-        val base = "EUR"
         val value = "2.1"
-        presenter.onRateChanged(base, value)
+        presenter.onRateChanged(defaultBase, value)
 
         verifyNoMoreInteractions(view)
     }
@@ -87,6 +86,6 @@ class MainActivityPresenterTest {
 
         Thread.sleep(1100)
 
-        verify(service).conversions("EUR")
+        verify(service).conversions(defaultBase)
     }
 }
