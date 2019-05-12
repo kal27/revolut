@@ -26,6 +26,7 @@ class MainActivityPresenterTest {
         presenter.onAttach(view)
 
         verify(view).showProgressBar()
+        verify(view).hideList()
     }
 
     @Test
@@ -55,6 +56,7 @@ class MainActivityPresenterTest {
 
         verify(view).loadRates(map.toList().map { Rate(it.first, it.second) })
         verify(view).hideProgressBar()
+        verify(view).showList()
     }
 
     @Test
@@ -76,5 +78,15 @@ class MainActivityPresenterTest {
         presenter.onRateChanged(base, value)
 
         verifyNoMoreInteractions(view)
+    }
+
+    @Test
+    fun `on refresh presenter starts updating data`() {
+        presenter.onAttach(view)
+        presenter.onRefresh()
+
+        Thread.sleep(1100)
+
+        verify(service).conversions("EUR")
     }
 }
