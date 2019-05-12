@@ -8,3 +8,5 @@ data class Conversion(
     @SerializedName("date") val date: String,
     @SerializedName("rates") val rates: SortedMap<String, Double>
 )
+
+data class Rate(val base: String, var value: Double)
