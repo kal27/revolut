@@ -1,6 +1,7 @@
 package com.example.myapplication.ui
 
 import com.example.myapplication.model.Conversion
+import com.example.myapplication.model.Rate
 import com.example.myapplication.network.ConversionsService
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -11,50 +12,62 @@ import javax.inject.Inject
 
 class MainActivityPresenter @Inject constructor(private val service: ConversionsService) {
 
-    var disposable: Disposable? = null
+    private var disposable: Disposable? = null
+        set(value) {
+            field?.dispose()
+            field = value
+        }
 
-    var view: View? = null
+    private var view: View? = null
 
-    private var hasFocus = false
+    private var base = "EUR"
 
     fun onAttach(view: View) {
         this.view = view
+
         startUpdating()
     }
 
     private fun startUpdating() {
+        view?.showProgressBar()
         disposable = Observable
             .interval(1, TimeUnit.SECONDS)
-            .filter { !hasFocus }
             .flatMap { updateData() }
-            .subscribe({
-                view?.loadRates(it.rates.toList())
-            }, {
-                view?.presentToast(it.localizedMessage)
-            })
+            .subscribe(this::handleResult, this::handleError)
     }
 
-    fun onFocusChanged(hasFocus: Boolean) {
-        this.hasFocus = hasFocus
+    private fun handleResult(conversion: Conversion) {
+        val list = conversion.rates.toList()
+        view?.loadRates(list.map { Rate(it.first, it.second) })
+        view?.hideProgressBar()
+    }
+
+    private fun handleError(error: Throwable) {
+        view?.presentToast(error.localizedMessage)
     }
 
     private fun updateData(): Observable<Conversion> {
-        return service.conversions("EUR")
+        return service.conversions(base)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.single())
     }
 
-    fun onListClicked() {
-        hasFocus = false
+    fun onRateChanged(base: String, value: String) {
+        this.base = base
+        val baseValue = value.toDoubleOrNull() ?: return
+        view?.updateBaseValue(baseValue, base)
     }
 
     fun onDetach() {
-        disposable?.dispose()
+        disposable = null
         view = null
     }
 
     interface View {
-        fun loadRates(list: List<Pair<String, Double>>)
+        fun showProgressBar()
+        fun hideProgressBar()
+        fun loadRates(list: List<Rate>)
+        fun updateBaseValue(baseValue: Double, base: String)
         fun presentToast(message: String)
     }
 }
